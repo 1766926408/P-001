@@ -1,0 +1,24 @@
+{
+  "id": "conv-1776305987679-p7suiz8ut",
+  "providerId": "claude",
+  "title": "P-001| B3 | 邀测用户群建立（8",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1776305987679,
+  "updatedAt": 1776333611376,
+  "lastResponseAt": 1776333611376,
+  "sessionId": "e8c3456d-e163-4ed3-b7a1-722e8d17996f",
+  "providerState": {
+    "providerSessionId": "e8c3456d-e163-4ed3-b7a1-722e8d17996f"
+  },
+  "currentNote": "02-Daily/日常随手记.md",
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 10,
+    "cacheCreationInputTokens": 92997,
+    "cacheReadInputTokens": 0,
+    "contextWindow": 200000,
+    "contextTokens": 93007,
+    "percentage": 47,
+    "contextWindowIsAuthoritative": true
+  }
+}

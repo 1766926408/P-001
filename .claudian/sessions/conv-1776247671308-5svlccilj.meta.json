@@ -1,0 +1,23 @@
+{
+  "id": "conv-1776247671308-5svlccilj",
+  "providerId": "claude",
+  "title": "创建一个日常随手记的文件",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1776247671308,
+  "updatedAt": 1776305844080,
+  "lastResponseAt": 1776255363867,
+  "sessionId": "54cac743-9e68-423a-9ad2-035113a01f7a",
+  "providerState": {
+    "providerSessionId": "54cac743-9e68-423a-9ad2-035113a01f7a"
+  },
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 8,
+    "cacheCreationInputTokens": 2008,
+    "cacheReadInputTokens": 103201,
+    "contextWindow": 200000,
+    "contextTokens": 105217,
+    "percentage": 53,
+    "contextWindowIsAuthoritative": true
+  }
+}

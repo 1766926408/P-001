@@ -1,0 +1,23 @@
+{
+  "id": "conv-1776239935554-swbyj4vjk",
+  "providerId": "claude",
+  "title": "帮我在 03-Bugs 里新增一条 Bug 记录，BUG-007，",
+  "titleGenerationStatus": "failed",
+  "createdAt": 1776239935560,
+  "updatedAt": 1776305829151,
+  "lastResponseAt": 1776247446584,
+  "sessionId": "2c67f1d6-3e17-4f79-8310-a07612b39460",
+  "providerState": {
+    "providerSessionId": "2c67f1d6-3e17-4f79-8310-a07612b39460"
+  },
+  "usage": {
+    "model": "haiku",
+    "inputTokens": 8,
+    "cacheCreationInputTokens": 801,
+    "cacheReadInputTokens": 133156,
+    "contextWindow": 200000,
+    "contextTokens": 133965,
+    "percentage": 67,
+    "contextWindowIsAuthoritative": true
+  }
+}

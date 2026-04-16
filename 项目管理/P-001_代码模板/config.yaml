@@ -1,0 +1,141 @@
+# ============================================
+# P-001 邀测招募 - 配置文件
+# ============================================
+
+app:
+  name: "P-001 邀测招募自动化系统"
+  version: "1.0.0"
+  environment: "development"  # development | production
+
+# ============ Google Sheets API ============
+google_sheets:
+  enabled: true
+  sheet_id: "${GOOGLE_SHEET_ID}"
+  credentials_file: "google-credentials.json"
+  worksheets:
+    users: "users-base"
+    feedback: "feedback-log"
+    invites: "invitation-tracking"
+    stats: "stats-dashboard"
+
+# ============ 微信配置 ============
+wechat:
+  enabled: true
+  corp_id: "${WECHAT_CORP_ID}"
+  agent_id: "${WECHAT_AGENT_ID}"
+  secret: "${WECHAT_SECRET}"
+  # 自动回复模板
+  auto_reply: |
+    欢迎加入【产品名称】邀测群！🎉
+
+    👇 请按下列步骤完成登记：
+    1️⃣ 点击链接，填写用户信息：[邀测链接]
+    2️⃣ 每周五提交一份反馈
+    3️⃣ 邀请2位用户可获得奖励积分
+
+    有问题？回复【问题】获取帮助
+
+# ============ QQ机器人配置 ============
+qq:
+  enabled: false
+  bot_type: "go-cqhttp"  # go-cqhttp | nonebot2
+  api_base_url: "http://localhost:5700"
+
+# ============ 邀请链接配置 ============
+invites:
+  base_url: "https://invite.yourapp.com"
+  redirect_url: "https://form.jotform.com/your-form-id"
+  tracking_enabled: true
+
+# ============ 激励规则 ============
+rewards:
+  rules:
+    join_group: 5           # 加入群聊
+    submit_feedback: 10     # 提交反馈
+    invite_friend: 15       # 邀请朋友（每人）
+    feedback_selected: 20   # 反馈被采用
+    weekly_active: 5        # 周活跃
+
+  exchange:
+    50: "产品8折优惠券"
+    100: "产品免费使用1个月"
+    200: "产品高级版本升级"
+    500: "产品定制功能咨询"
+
+# ============ 定时任务 ============
+schedules:
+  calculate_rewards:
+    enabled: true
+    cron: "0 6 * * *"  # 每天早6点
+
+  distribute_rewards:
+    enabled: true
+    cron: "0 9 * * *"  # 每天早9点
+
+  sync_feedback:
+    enabled: true
+    cron: "0 12 * * *"  # 每天下午12点
+
+  publish_zhihu:
+    enabled: true
+    cron: "0 9 * * 0"  # 每周一早9点
+
+  generate_report:
+    enabled: true
+    cron: "0 17 * * 4"  # 每周五下午5点
+
+  backup_data:
+    enabled: true
+    cron: "0 2 * * *"  # 每天凌晨2点
+
+# ============ 通知配置 ============
+notifications:
+  dingtalk:
+    enabled: false
+    webhook: "${DINGTALK_WEBHOOK}"
+
+  feishu:
+    enabled: false
+    webhook: "${FEISHU_WEBHOOK}"
+
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    from_email: "${EMAIL_USER}"
+    from_password: "${EMAIL_PASSWORD}"
+    to_emails: ["admin@yourapp.com"]
+
+# ============ 日志配置 ============
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/recruitment.log"
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# ============ 数据库配置（可选） ============
+database:
+  enabled: false
+  type: "sqlite"  # sqlite | postgresql | mysql
+  url: "sqlite:///recruitment.db"
+
+# ============ 缓存配置 ============
+cache:
+  enabled: true
+  type: "memory"  # memory | redis
+  ttl: 3600  # 秒
+
+# ============ API配置 ============
+api:
+  enabled: true
+  host: "0.0.0.0"
+  port: 8000
+  debug: false
+
+# ============ 其他配置 ============
+misc:
+  timezone: "Asia/Shanghai"
+  batch_size: 100
+  retry_max_attempts: 3
+  retry_delay_seconds: 5
