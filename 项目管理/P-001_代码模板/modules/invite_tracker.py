@@ -7,7 +7,7 @@
 import logging
 import uuid
 from typing import Dict, Optional
-from .google_sheet import SheetManager
+from .sqlite_manager import SQLiteManager
 
 logger = logging.getLogger(__name__)
 
@@ -17,7 +17,7 @@ class InviteTracker:
 
     def __init__(self, invite_domain: str = 'https://invite.yourapp.com'):
         """初始化"""
-        self.sheet_manager = SheetManager()
+        self.db = SQLiteManager()
         self.invite_domain = invite_domain
         logger.info("✅ 邀请追踪器初始化完成")
 

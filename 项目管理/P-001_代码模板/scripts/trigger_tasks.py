@@ -49,15 +49,14 @@ def trigger_sync_feedback():
     """手动触发反馈同步"""
     print("\n🔄 手动触发反馈同步...\n")
 
-    from modules.google_sheet import SheetManager
-    sm = SheetManager()
-    result = sm.sync_feedback()
+    from modules.sqlite_manager import SQLiteManager
+    db = SQLiteManager()
+    feedbacks = db.get_all_feedback()
 
-    print(f"\n✅ 反馈同步完成")
-    print(f"   • 微信: {result.get('wechat')}")
-    print(f"   • QQ: {result.get('qq')}")
-    print(f"   • 论坛: {result.get('forum')}")
-    print(f"   • 总计: {result.get('total')}\n")
+    print(f"\n✅ 反馈数据加载完成")
+    print(f"   • 总反馈数: {len(feedbacks)}")
+    print(f"   • 最新反馈: {feedbacks[0] if feedbacks else 'N/A'}\n")
+    db.close()
 
 
 def trigger_generate_report():
@@ -73,19 +72,33 @@ def trigger_backup_data():
     """手动触发数据备份"""
     print("\n💾 手动触发数据备份...\n")
 
-    from modules.google_sheet import SheetManager
-    sm = SheetManager()
-    success = sm.backup_data()
+    import shutil
+    from datetime import datetime
 
-    print(f"\n✅ 数据备份完成\n" if success else "\n❌ 数据备份失败\n")
+    try:
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        backup_path = f'backups/recruitment_backup_{timestamp}.db'
+        shutil.copy('recruitment.db', backup_path)
+        print(f"\n✅ 数据备份完成: {backup_path}\n")
+    except Exception as e:
+        print(f"\n❌ 数据备份失败: {e}\n")
 
 
 def show_stats():
     """显示实时统计"""
     print("\n📊 实时统计数据...\n")
 
-    from modules.google_sheet import SheetManager, print_dashboard
-    print_dashboard()
+    from modules.sqlite_manager import SQLiteManager
+    db = SQLiteManager()
+    stats = db.get_stats()
+
+    print(f"📊 数据库统计:")
+    print(f"   • 总用户数: {stats.get('total_users', 0)}")
+    print(f"   • 总反馈数: {stats.get('total_feedbacks', 0)}")
+    print(f"   • 总邀请数: {stats.get('total_invitations', 0)}")
+    print()
+
+    db.close()
 
 
 def main():

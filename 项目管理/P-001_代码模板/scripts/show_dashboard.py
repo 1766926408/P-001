@@ -16,12 +16,20 @@ load_dotenv()
 
 
 def main():
-    from modules.google_sheet import SheetManager, print_dashboard
+    from modules.sqlite_manager import SQLiteManager
     from modules.rewards import RewardCalculator
     from modules.invite_tracker import InviteTracker
 
-    # 显示Google Sheet仪表板
-    print_dashboard()
+    # 显示SQLite数据库统计
+    db = SQLiteManager()
+    stats = db.get_stats()
+    print("\n" + "="*60)
+    print("📊 数据库统计")
+    print("="*60)
+    print(f"总用户数: {stats.get('total_users', 0)}")
+    print(f"总反馈数: {stats.get('total_feedbacks', 0)}")
+    print(f"总邀请数: {stats.get('total_invitations', 0)}")
+    db.close()
 
     # 显示积分排行榜
     rc = RewardCalculator()
