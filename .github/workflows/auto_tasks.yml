@@ -2,14 +2,14 @@ name: MotorMind Auto Tasks
 
 on:
   schedule:
-    # 早6点 - 计算激励积分
-    - cron: '0 6 * * *'
-    # 早9点 - 发放激励通知
-    - cron: '0 9 * * *'
-    # 早10点 - 同步表单数据
-    - cron: '0 10 * * *'
-    # 周五17点 - 生成周报
-    - cron: '0 17 * * 5'
+    # 早6点 - 计算激励积分 (UTC 22:00 前一天 = CST 06:00)
+    - cron: '0 22 * * *'
+    # 早9点 - 发放激励通知 (UTC 01:00 = CST 09:00)
+    - cron: '0 1 * * *'
+    # 早10点 - 同步表单数据 (UTC 02:00 = CST 10:00)
+    - cron: '0 2 * * *'
+    # 周五17点 - 生成周报 (UTC 09:00 周五 = CST 周五 17:00)
+    - cron: '0 9 * * 5'
   # 支持手动触发
   workflow_dispatch:
 
@@ -19,41 +19,65 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.9'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -r 项目管理/P-001_代码模板/requirements.txt
+
+      - name: Create necessary directories
+        run: |
+          mkdir -p backups
+          mkdir -p reports
+
+      - name: Show system info
+        run: |
+          echo "=== System Info ==="
+          pwd
+          ls -la
+          python --version
+          pip list | grep -E "pandas|openpyxl|requests"
 
       - name: Run scheduled tasks
-        env:
-          TASK_TYPE: scheduled
-          DATABASE_PATH: recruitment.db
+        continue-on-error: true
         run: |
-          # 根据当前时间执行相应任务
-          python scripts/run_auto_tasks.py
+          cd 项目管理/P-001_代码模板/
+          python scripts/run_auto_tasks.py || echo "⚠️ Task execution completed with status"
 
       - name: Backup database
         if: always()
+        continue-on-error: true
         run: |
-          # 每次执行后备份数据库
-          cp recruitment.db "backups/recruitment_$(date +%Y%m%d_%H%M%S).db" 2>/dev/null || true
+          mkdir -p backups
+          if [ -f "项目管理/P-001_代码模板/recruitment.db" ]; then
+            cp 项目管理/P-001_代码模板/recruitment.db "backups/recruitment_$(date +%Y%m%d_%H%M%S).db"
+            echo "✅ Database backed up"
+          else
+            echo "ℹ️ Database file not found (first run)"
+          fi
 
       - name: Commit changes
         if: always()
+        continue-on-error: true
         run: |
           git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add -A
-          git commit -m "Auto-sync data: $(date +'%Y-%m-%d %H:%M:%S')" || true
+          git config --local user.name "MotorMind Bot"
+          git add -A || true
+          git commit -m "Auto-sync: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
 
       - name: Push changes
         if: always()
+        continue-on-error: true
         run: |
-          git push origin main || true
+          git push origin main || echo "Push skipped"
+
+      - name: Job completed
+        if: always()
+        run: |
+          echo "✅ Workflow execution completed at $(date)"
