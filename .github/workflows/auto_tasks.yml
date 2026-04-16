@@ -2,10 +2,10 @@ name: MotorMind Auto Tasks
 
 on:
   schedule:
-    - cron: '0 22 * * *'  # 06:00 CST (UTC 22:00 prev day)
-    - cron: '0 1 * * *'   # 09:00 CST (UTC 01:00)
-    - cron: '0 2 * * *'   # 10:00 CST (UTC 02:00)
-    - cron: '0 9 * * 5'   # 17:00 CST Fri (UTC 09:00 Fri)
+    - cron: '0 22 * * *'
+    - cron: '0 1 * * *'
+    - cron: '0 2 * * *'
+    - cron: '0 9 * * 5'
   workflow_dispatch:
 
 jobs:
@@ -13,38 +13,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Install dependencies (no requirements.txt)
+      - name: Install and run
         run: |
           pip install --upgrade pip
           pip install pandas openpyxl requests apscheduler python-dotenv
-
-      - name: Create directories
-        run: mkdir -p backups reports
-
-      - name: Run automation
-        run: |
-          cd "项目管理/P-001_代码模板"
+          cd 项目管理/P-001_代码模板
           python scripts/run_auto_tasks.py
+        shell: bash
         continue-on-error: true
 
-      - name: Backup
+      - name: Save results
         if: always()
         run: |
           mkdir -p backups
-          if [ -f "项目管理/P-001_代码模板/recruitment.db" ]; then
-            cp "项目管理/P-001_代码模板/recruitment.db" "backups/db_$(date +%s).db"
-          fi
+          [ -f 项目管理/P-001_代码模板/recruitment.db ] && cp 项目管理/P-001_代码模板/recruitment.db backups/db_$(date +%s).db || true
+        shell: bash
 
-      - name: Git sync
+      - name: Sync to GitHub
         if: always()
         run: |
           git config --local user.email "bot@github.com"
           git config --local user.name "Bot"
           git add -A || true
-          git commit -m "Auto: $(date)" || true
+          git commit -m "sync" || true
           git push || true
+        shell: bash
