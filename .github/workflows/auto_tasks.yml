@@ -13,48 +13,36 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          clean: true
+          fetch-depth: 1
+
       - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Fix pip cache issue
+      - name: Setup environment
         run: |
           echo "# Empty requirements file" > requirements.txt
-        shell: bash
-
-      - name: Install packages directly
-        run: |
           pip install --upgrade pip
-          pip install pandas openpyxl requests apscheduler python-dotenv 2>&1 | tail -20
-        shell: bash
+          pip install pandas openpyxl requests apscheduler python-dotenv
 
-      - name: Clear Python cache and run task
+      - name: Run automation
         run: |
           cd 项目管理/P-001_代码模板
-          # 清除缓存
-          find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
-          find . -name "*.pyc" -delete 2>/dev/null || true
-          echo "Cache cleared, running task..."
-          # 运行任务
-          python -B scripts/run_auto_tasks.py 2>&1
-        shell: bash
-        continue-on-error: true
+          python -B -u scripts/run_auto_tasks.py
+        env:
+          PYTHONDONTWRITEBYTECODE: 1
 
-      - name: Backup database
+      - name: Backup and sync
         if: always()
         run: |
           mkdir -p backups
           if [ -f 项目管理/P-001_代码模板/recruitment.db ]; then
             cp 项目管理/P-001_代码模板/recruitment.db backups/db_$(date +%s).db
           fi
-        shell: bash
-
-      - name: Commit and push
-        if: always()
-        run: |
           git config --local user.email "bot@github.com"
           git config --local user.name "Bot"
           git add -A || true
           git commit -m "auto sync $(date)" || true
           git push || true
-        shell: bash
