@@ -2,62 +2,49 @@ name: MotorMind Auto Tasks
 
 on:
   schedule:
-    # 早6点 - 计算激励积分 (UTC 22:00 前一天 = CST 06:00)
-    - cron: '0 22 * * *'
-    # 早9点 - 发放激励通知 (UTC 01:00 = CST 09:00)
-    - cron: '0 1 * * *'
-    # 早10点 - 同步表单数据 (UTC 02:00 = CST 10:00)
-    - cron: '0 2 * * *'
-    # 周五17点 - 生成周报 (UTC 09:00 周五 = CST 周五 17:00)
-    - cron: '0 9 * * 5'
-  # 支持手动触发
+    - cron: '0 22 * * *'  # 06:00 CST (UTC 22:00 prev day)
+    - cron: '0 1 * * *'   # 09:00 CST (UTC 01:00)
+    - cron: '0 2 * * *'   # 10:00 CST (UTC 02:00)
+    - cron: '0 9 * * 5'   # 17:00 CST Fri (UTC 09:00 Fri)
   workflow_dispatch:
 
 jobs:
   auto-tasks:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.9'
 
-      - name: Install dependencies
+      - name: Install dependencies (no requirements.txt)
         run: |
-          python -m pip install --upgrade pip
-          pip install pandas openpyxl requests APScheduler python-dotenv
+          pip install --upgrade pip
+          pip install pandas openpyxl requests apscheduler python-dotenv
 
-      - name: Create necessary directories
+      - name: Create directories
+        run: mkdir -p backups reports
+
+      - name: Run automation
+        run: |
+          cd "项目管理/P-001_代码模板"
+          python scripts/run_auto_tasks.py
+        continue-on-error: true
+
+      - name: Backup
+        if: always()
         run: |
           mkdir -p backups
-          mkdir -p reports
-
-      - name: Run scheduled tasks
-        run: |
-          cd "$GITHUB_WORKSPACE/项目管理/P-001_代码模板"
-          python scripts/run_auto_tasks.py
-        shell: bash
-
-      - name: Backup database
-        if: always()
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/backups"
-          if [ -f "$GITHUB_WORKSPACE/项目管理/P-001_代码模板/recruitment.db" ]; then
-            cp "$GITHUB_WORKSPACE/项目管理/P-001_代码模板/recruitment.db" "$GITHUB_WORKSPACE/backups/recruitment_$(date +%Y%m%d_%H%M%S).db"
-            echo "✅ Database backed up"
+          if [ -f "项目管理/P-001_代码模板/recruitment.db" ]; then
+            cp "项目管理/P-001_代码模板/recruitment.db" "backups/db_$(date +%s).db"
           fi
-        shell: bash
 
-      - name: Commit and push changes
+      - name: Git sync
         if: always()
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "MotorMind Bot"
+          git config --local user.email "bot@github.com"
+          git config --local user.name "Bot"
           git add -A || true
-          git commit -m "Auto-sync: $(date +'%Y-%m-%d %H:%M:%S')" || true
-          git push origin main || true
-        shell: bash
+          git commit -m "Auto: $(date)" || true
+          git push || true
