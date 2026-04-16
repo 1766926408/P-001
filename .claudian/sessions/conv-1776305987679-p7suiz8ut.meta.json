@@ -4,8 +4,8 @@
   "title": "P-001| B3 | 邀测用户群建立（8",
   "titleGenerationStatus": "failed",
   "createdAt": 1776305987679,
-  "updatedAt": 1776333611376,
-  "lastResponseAt": 1776333611376,
+  "updatedAt": 1776334077291,
+  "lastResponseAt": 1776334077291,
   "sessionId": "e8c3456d-e163-4ed3-b7a1-722e8d17996f",
   "providerState": {
     "providerSessionId": "e8c3456d-e163-4ed3-b7a1-722e8d17996f"
@@ -14,10 +14,10 @@
   "usage": {
     "model": "haiku",
     "inputTokens": 10,
-    "cacheCreationInputTokens": 92997,
+    "cacheCreationInputTokens": 93787,
     "cacheReadInputTokens": 0,
     "contextWindow": 200000,
-    "contextTokens": 93007,
+    "contextTokens": 93797,
     "percentage": 47,
     "contextWindowIsAuthoritative": true
   }
