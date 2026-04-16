@@ -24,60 +24,40 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.9'
 
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r 项目管理/P-001_代码模板/requirements.txt
+          pip install pandas openpyxl requests APScheduler python-dotenv
 
       - name: Create necessary directories
         run: |
           mkdir -p backups
           mkdir -p reports
 
-      - name: Show system info
-        run: |
-          echo "=== System Info ==="
-          pwd
-          ls -la
-          python --version
-          pip list | grep -E "pandas|openpyxl|requests"
-
       - name: Run scheduled tasks
-        continue-on-error: true
         run: |
-          cd 项目管理/P-001_代码模板/
-          python scripts/run_auto_tasks.py || echo "⚠️ Task execution completed with status"
+          cd "$GITHUB_WORKSPACE/项目管理/P-001_代码模板"
+          python scripts/run_auto_tasks.py
+        shell: bash
 
       - name: Backup database
         if: always()
-        continue-on-error: true
         run: |
-          mkdir -p backups
-          if [ -f "项目管理/P-001_代码模板/recruitment.db" ]; then
-            cp 项目管理/P-001_代码模板/recruitment.db "backups/recruitment_$(date +%Y%m%d_%H%M%S).db"
+          mkdir -p "$GITHUB_WORKSPACE/backups"
+          if [ -f "$GITHUB_WORKSPACE/项目管理/P-001_代码模板/recruitment.db" ]; then
+            cp "$GITHUB_WORKSPACE/项目管理/P-001_代码模板/recruitment.db" "$GITHUB_WORKSPACE/backups/recruitment_$(date +%Y%m%d_%H%M%S).db"
             echo "✅ Database backed up"
-          else
-            echo "ℹ️ Database file not found (first run)"
           fi
+        shell: bash
 
-      - name: Commit changes
+      - name: Commit and push changes
         if: always()
-        continue-on-error: true
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "MotorMind Bot"
           git add -A || true
-          git commit -m "Auto-sync: $(date +'%Y-%m-%d %H:%M:%S')" || echo "No changes to commit"
-
-      - name: Push changes
-        if: always()
-        continue-on-error: true
-        run: |
-          git push origin main || echo "Push skipped"
-
-      - name: Job completed
-        if: always()
-        run: |
-          echo "✅ Workflow execution completed at $(date)"
+          git commit -m "Auto-sync: $(date +'%Y-%m-%d %H:%M:%S')" || true
+          git push origin main || true
+        shell: bash
